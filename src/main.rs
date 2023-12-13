@@ -4,6 +4,7 @@ mod utility;
 
 use sdl2::event::Event;
 use sdl2::pixels::Color;
+use sdl2::rect::Rect;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 use sdl2::EventPump;
@@ -82,6 +83,17 @@ async fn main() -> Result<(), MyError> {
                 _ => {}
             }
         }
+
+        canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
+        canvas.clear();
+
+        // for tile in &tiles {
+        //     let texture = &tile.texture;
+        //     let query = texture.query();
+        //     let texture_rect = Rect::new(0, 0, query.width, query.height);
+        //
+        //     canvas.copy(texture, None, Some(texture_rect))?;
+        // }
 
         canvas.present();
     }

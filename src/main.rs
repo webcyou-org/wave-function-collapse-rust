@@ -103,11 +103,33 @@ async fn main() -> Result<(), MyError> {
     Ok(())
 }
 
-// pub fn generating_adjacency_rules(tiles: &mut [Tile]) {
-//     let tile_clones = tiles.to_vec();
-//     for (index, tile) in tiles.iter_mut().enumerate() {
-//         tile.analyze(&tile_clones);
+// fn draw(grid: &[Cell], tiles: &[Tile], size: Vector2) {
+//     let w = size.x / DIM as f32;
+//     let h = size.y / DIM as f32;
+//
+//     for j in 0..DIM {
+//         for i in 0..DIM {
+//             let index = i + j * DIM;
+//             let cell = &grid[index];
+//             if cell.collapsed {
+//                 let tile_index = cell.sockets[0];
+//                 let tile = &tiles[tile_index];
+//                 // Add code here to draw the tile using tile.create_sprite_component(w, h, i * w, j * h)
+//             }
+//         }
 //     }
+// }
+
+// fn main_loop(grid: &mut Vec<Cell>) {
+//     let low_entropy_grid = pick_cell_with_least_entropy(grid);
+//     if low_entropy_grid.is_empty() {
+//         return;
+//     }
+//     if !random_selection_of_sockets(low_entropy_grid) {
+//         start_over(grid);
+//         return;
+//     }
+//     wave_collapse(grid);
 // }
 
 pub fn generating_adjacency_rules(tiles: &mut [Tile]) {

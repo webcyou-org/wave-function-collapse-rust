@@ -2,6 +2,12 @@ mod constants;
 mod core;
 mod utility;
 
+use crate::constants::defines::*;
+use crate::core::cell::Cell;
+use crate::core::tile::Tile;
+use crate::utility::error::*;
+use rand::seq::SliceRandom;
+use rand::Rng;
 use sdl2::event::Event;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
@@ -13,10 +19,6 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Read;
 use tokio;
-
-use crate::constants::defines::*;
-use crate::core::tile::Tile;
-use crate::utility::error::*;
 
 async fn load_json_data(file_name: &str) -> Result<TileListData, MyError> {
     let mut file = File::open(format!("assets/data/{}", file_name))?;
@@ -99,4 +101,132 @@ async fn main() -> Result<(), MyError> {
     }
 
     Ok(())
+}
+
+// pub fn generating_adjacency_rules(tiles: &mut [Tile]) {
+//     let tile_clones = tiles.to_vec();
+//     for (index, tile) in tiles.iter_mut().enumerate() {
+//         tile.analyze(&tile_clones);
+//     }
+// }
+
+pub fn generating_adjacency_rules(tiles: &mut [Tile]) {
+    let tile_edges: Vec<_> = tiles.iter().map(|tile| tile.edges.clone()).collect();
+    for (index, tile) in tiles.iter_mut().enumerate() {
+        tile.analyze(&tile_edges, index);
+    }
+}
+
+pub fn create_rotate_tiles(tiles: &mut Vec<Tile>) {
+    let mut new_tiles = Vec::new();
+
+    for tile in tiles.iter() {
+        if tile.is_rotate {
+            for j in 1..4 {
+                new_tiles.push(tile.rotate(j));
+            }
+        }
+    }
+    tiles.extend(new_tiles);
+}
+
+fn pick_cell_with_least_entropy(grid: &[Cell]) -> Vec<Cell> {
+    let mut grid_copy: Vec<Cell> = grid
+        .iter()
+        .filter(|cell| !cell.collapsed)
+        .cloned()
+        .collect();
+
+    if grid_copy.is_empty() {
+        return Vec::new();
+    }
+
+    grid_copy.sort_by_key(|cell| cell.sockets.len());
+
+    let len = grid_copy[0].sockets.len();
+    let stop_index = grid_copy
+        .iter()
+        .position(|cell| cell.sockets.len() > len)
+        .unwrap_or(grid_copy.len());
+
+    grid_copy.truncate(stop_index);
+    grid_copy
+}
+
+fn random_selection_of_sockets(grid_target: &mut [Cell]) -> bool {
+    let mut rng = rand::thread_rng();
+
+    if let Some(cell) = grid_target.choose_mut(&mut rng) {
+        cell.collapsed = true;
+
+        if cell.sockets.is_empty() {
+            return false;
+        }
+
+        if let Some(&pick) = cell.sockets.choose(&mut rng) {
+            cell.sockets = vec![pick];
+            true
+        } else {
+            false
+        }
+    } else {
+        false
+    }
+}
+
+fn wave_collapse(grid: &mut Vec<Cell>, tiles: &[Tile]) {
+    let mut next_grid: Vec<Option<Cell>> = vec![None; DIM * DIM];
+
+    for j in 0..DIM {
+        for i in 0..DIM {
+            let index = i + j * DIM;
+
+            if grid[index].collapsed {
+                next_grid[index] = Some(grid[index].clone());
+            } else {
+                let mut sockets: Vec<usize> = (0..tiles.len()).collect();
+
+                // Look up
+                if j > 0 {
+                    cell_collapse(&mut grid[i + (j - 1) * DIM], "down", &mut sockets, tiles);
+                }
+                // Look right
+                if i < DIM - 1 {
+                    cell_collapse(&mut grid[i + 1 + j * DIM], "left", &mut sockets, tiles);
+                }
+                // Look down
+                if j < DIM - 1 {
+                    cell_collapse(&mut grid[i + (j + 1) * DIM], "up", &mut sockets, tiles);
+                }
+                // Look left
+                if i > 0 {
+                    cell_collapse(&mut grid[i - 1 + j * DIM], "right", &mut sockets, tiles);
+                }
+                next_grid[index] = Some(Cell::from_list(sockets));
+            }
+        }
+    }
+
+    grid.clear();
+    grid.extend(next_grid.into_iter().filter_map(|cell| cell));
+}
+
+fn cell_collapse(cell: &Cell, direction: &str, sockets: &mut Vec<usize>, tiles: &[Tile]) {
+    let valid_sockets = get_valid_sockets(cell, direction, tiles);
+    check_valid(sockets, &valid_sockets);
+}
+
+fn get_valid_sockets(cell: &Cell, direction: &str, tiles: &[Tile]) -> Vec<usize> {
+    let mut valid_sockets = Vec::new();
+
+    for &socket in &cell.sockets {
+        let valid = &tiles[socket as usize].valid(direction);
+        valid_sockets.extend(valid);
+    }
+
+    valid_sockets
+}
+
+fn check_valid(sockets: &mut Vec<usize>, valid_sockets: &[usize]) {
+    sockets.retain(|socket| valid_sockets.contains(socket));
 }

@@ -39,23 +39,47 @@ impl<'a> Tile<'a> {
         })
     }
 
-    pub fn analyze(&mut self, tiles: &[Tile]) {
-        for (i, tile) in tiles.iter().enumerate() {
+    // pub fn analyze(&mut self, tiles: &[Tile]) {
+    //     for (i, tile) in tiles.iter().enumerate() {
+    //         // UP
+    //         if compare_edge(&tile.edges[2], &self.edges[0]) {
+    //             self.up.push(i);
+    //         }
+    //         // RIGHT
+    //         if compare_edge(&tile.edges[3], &self.edges[1]) {
+    //             self.right.push(i);
+    //         }
+    //         // DOWN
+    //         if compare_edge(&tile.edges[0], &self.edges[2]) {
+    //             self.down.push(i);
+    //         }
+    //         // LEFT
+    //         if compare_edge(&tile.edges[1], &self.edges[3]) {
+    //             self.left.push(i);
+    //         }
+    //     }
+    // }
+
+    pub fn analyze(&mut self, tile_edges: &[Vec<String>], current_index: usize) {
+        for (index, edges) in tile_edges.iter().enumerate() {
+            if index == current_index {
+                continue;
+            }
             // UP
-            if compare_edge(&tile.edges[2], &self.edges[0]) {
-                self.up.push(i);
+            if compare_edge(&edges[2], &self.edges[0]) {
+                self.up.push(index);
             }
             // RIGHT
-            if compare_edge(&tile.edges[3], &self.edges[1]) {
-                self.right.push(i);
+            if compare_edge(&edges[3], &self.edges[1]) {
+                self.right.push(index);
             }
             // DOWN
-            if compare_edge(&tile.edges[0], &self.edges[2]) {
-                self.down.push(i);
+            if compare_edge(&edges[0], &self.edges[2]) {
+                self.down.push(index);
             }
             // LEFT
-            if compare_edge(&tile.edges[1], &self.edges[3]) {
-                self.left.push(i);
+            if compare_edge(&edges[1], &self.edges[3]) {
+                self.left.push(index);
             }
         }
     }
@@ -70,7 +94,7 @@ impl<'a> Tile<'a> {
         }
     }
 
-    fn rotate(&self, num: i32) -> Tile<'a> {
+    pub fn rotate(&self, num: i32) -> Tile<'a> {
         let rotation = num as f64 * (PI / 2.0);
         let new_edges = self
             .edges

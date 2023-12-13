@@ -50,7 +50,7 @@ async fn create_tiles_from_json<'a>(
 fn sdl_init(sdl_context: &Sdl) -> Result<Canvas<Window>, MyError> {
     let video_subsystem = sdl_context.video()?;
     let window = video_subsystem
-        .window("Wave Function Collapse", GAME_WIDTH, GAME_HEIGHT)
+        .window(WINDOW_TITLE, GAME_WIDTH, GAME_HEIGHT)
         .position_centered()
         .build()
         .map_err(|e| e.to_string())?;
@@ -65,7 +65,10 @@ async fn main() -> Result<(), MyError> {
     let sdl_context = sdl2::init()?;
     let mut canvas = sdl_init(&sdl_context)?;
     let texture_creator = canvas.texture_creator();
-    let tiles = create_tiles_from_json(&texture_creator, "tile_simple.json").await?;
+    let mut tiles = create_tiles_from_json(&texture_creator, JSON_FILE_NAME).await?;
+    create_rotate_tiles(&mut tiles);
+
+    println!("{:?}", tiles.len());
 
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     canvas.clear();
@@ -90,12 +93,14 @@ async fn main() -> Result<(), MyError> {
         canvas.clear();
 
         // for tile in &tiles {
-        //     let texture = &tile.texture;
-        //     let query = texture.query();
-        //     let texture_rect = Rect::new(0, 0, query.width, query.height);
-        //
-        //     canvas.copy(texture, None, Some(texture_rect))?;
+        //     // let texture = &tile.texture;
+        //     // let query = texture.query();
+        //     // let texture_rect = Rect::new(0, 0, query.width, query.height);
+        //     //
+        //     // canvas.copy(texture, None, Some(texture_rect))?;
+        //     tile.render(&mut canvas, 0, 0, 100, 100);
         // }
+        // tiles[4].render(&mut canvas, 0, 0, 100, 100);
 
         canvas.present();
     }

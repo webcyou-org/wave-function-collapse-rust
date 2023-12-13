@@ -1,7 +1,8 @@
 use crate::utility::error::*;
 use crate::utility::utility::compare_edge;
 use sdl2::image::{self, LoadTexture};
-use sdl2::render::{Texture, TextureCreator};
+use sdl2::rect::{Point, Rect};
+use sdl2::render::{Canvas, Texture, TextureCreator};
 use sdl2::video::WindowContext;
 use std::f64::consts::PI;
 use std::rc::Rc;
@@ -95,7 +96,8 @@ impl<'a> Tile<'a> {
     }
 
     pub fn rotate(&self, num: i32) -> Tile<'a> {
-        let rotation = num as f64 * (PI / 2.0);
+        // let rotation = num as f64 * (PI / 2.0);
+        let rotation = num as f64 * 90.0;
         let new_edges = self
             .edges
             .iter()
@@ -117,5 +119,29 @@ impl<'a> Tile<'a> {
             down: Vec::new(),
             left: Vec::new(),
         }
+    }
+
+    pub fn render(
+        &self,
+        canvas: &mut Canvas<sdl2::video::Window>,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) {
+        let center_x = width as f64 / 2.0;
+        let center_y = height as f64 / 2.0;
+        let center_point = Point::new(center_x as i32, center_y as i32);
+        canvas
+            .copy_ex(
+                &*self.texture,
+                None,
+                Some(Rect::new(x, y, width, height)),
+                self.angle,
+                Some(center_point),
+                false,
+                false,
+            )
+            .expect("Failed to render tile");
     }
 }

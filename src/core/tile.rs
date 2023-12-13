@@ -17,7 +17,7 @@ impl<'a> Tile<'a> {
         edges: Vec<String>,
         is_rotate: bool,
     ) -> Result<Tile<'a>, MyError> {
-        let texture = texture_creator.load_texture(image_path)?;
+        let texture = texture_creator.load_texture(format!("assets/images/{}", image_path))?;
 
         Ok(Tile {
             texture,

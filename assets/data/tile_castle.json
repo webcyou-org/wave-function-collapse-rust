@@ -1,58 +1,58 @@
 {
-  "tileList": [
+  "tile_list": [
     {
       "src": "castle/ground.png",
       "edges": ["AAA", "AAA", "AAA", "AAA"],
-      "isRotate": false
+      "is_rotate": false
     },
     {
       "src": "castle/road.png",
       "edges": ["ABA", "AAA", "ABA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/roadturn.png",
       "edges": ["ABA", "ABA", "AAA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/t.png",
       "edges": ["AAA", "ABA", "ABA", "ABA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/river.png",
       "edges": ["ACA", "AAA", "ACA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/riverturn.png",
       "edges": ["ACA", "ACA", "AAA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/bridge.png",
       "edges": ["ACA", "ABA", "ACA", "ABA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/wall.png",
       "edges": ["ADA", "AAA", "ADA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/wallriver.png",
       "edges": ["ADA", "ACA", "ADA", "ACA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/wallroad.png",
       "edges": ["ADA", "ABA", "ADA", "ABA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "castle/tower.png",
       "edges": ["ADA", "ADA", "AAA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     }]
 }

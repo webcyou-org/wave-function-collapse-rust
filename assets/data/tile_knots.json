@@ -1,28 +1,28 @@
 {
-  "tileList": [
+  "tile_list": [
     {
       "src": "knots/empty.png",
       "edges": ["AAA", "AAA", "AAA", "AAA"],
-      "isRotate": false
+      "is_rotate": false
     },
     {
       "src": "knots/cross.png",
       "edges": ["ABA", "ABA", "ABA", "ABA"],
-      "isRotate": false
+      "is_rotate": false
     },
     {
       "src": "knots/corner.png",
       "edges": ["ABA", "ABA", "AAA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "knots/line.png",
       "edges": ["AAA", "ABA", "AAA", "ABA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "knots/t.png",
       "edges": ["AAA", "ABA", "ABA", "ABA"],
-      "isRotate": true
+      "is_rotate": true
     }]
 }

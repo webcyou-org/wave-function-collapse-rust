@@ -1,48 +1,48 @@
 {
-  "tileList": [
+  "tile_list": [
     {
       "src": "rooms/wall.png",
       "edges": ["AAA", "AAA", "AAA", "AAA"],
-      "isRotate": false
+      "is_rotate": false
     },
     {
       "src": "rooms/empty.png",
       "edges": ["BBB", "BBB", "BBB", "BBB"],
-      "isRotate": false
+      "is_rotate": false
     },
     {
       "src": "rooms/bend.png",
       "edges": ["BAA", "AAB", "BBB", "BBB"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "rooms/corner.png",
       "edges": ["AAB", "BAA", "AAA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "rooms/corridor.png",
       "edges": ["ABA", "AAA", "ABA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "rooms/door.png",
       "edges": ["BBB", "BAA", "ABA", "AAB"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "rooms/side.png",
       "edges": ["AAA", "AAB", "BBB", "BAA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "rooms/t.png",
       "edges": ["AAA", "ABA", "ABA", "ABA"],
-      "isRotate": true
+      "is_rotate": true
     },
     {
       "src": "rooms/turn.png",
       "edges": ["ABA", "ABA", "AAA", "AAA"],
-      "isRotate": true
+      "is_rotate": true
     }]
 }

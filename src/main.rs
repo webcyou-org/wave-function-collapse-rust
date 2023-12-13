@@ -62,6 +62,7 @@ async fn main() -> Result<(), MyError> {
     let sdl_context = sdl2::init()?;
     let mut canvas = sdl_init(&sdl_context)?;
     let texture_creator = canvas.texture_creator();
+    let tiles = create_tiles_from_json(&texture_creator, "tile_simple.json").await?;
 
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     canvas.clear();

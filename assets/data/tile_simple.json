@@ -1,13 +1,13 @@
 {
-  "tileList": [
+  "tile_list": [
     {
       "src": "simple/blank.png",
       "edges": ["AAA", "AAA", "AAA", "AAA"],
-      "isRotate": false
+      "is_rotate": false
     },
     {
       "src": "simple/t.png",
       "edges": ["AAA", "ABA", "ABA", "ABA"],
-      "isRotate": true
+      "is_rotate": true
     }]
 }

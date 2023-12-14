@@ -67,6 +67,9 @@ async fn main() -> Result<(), MyError> {
     let texture_creator = canvas.texture_creator();
     let mut tiles = create_tiles_from_json(&texture_creator, JSON_FILE_NAME).await?;
     create_rotate_tiles(&mut tiles);
+    let mut grid: Vec<Cell> = (0..DIM * DIM)
+        .map(|index| Cell::from_value(tiles.len()))
+        .collect();
 
     println!("{:?}", tiles.len());
 
@@ -100,6 +103,9 @@ async fn main() -> Result<(), MyError> {
         //     // canvas.copy(texture, None, Some(texture_rect))?;
         //     tile.render(&mut canvas, 0, 0, 100, 100);
         // }
+
+        draw(&mut canvas, &grid, &tiles);
+
         // tiles[4].render(&mut canvas, 0, 0, 100, 100);
 
         canvas.present();
@@ -108,22 +114,28 @@ async fn main() -> Result<(), MyError> {
     Ok(())
 }
 
-// fn draw(grid: &[Cell], tiles: &[Tile], size: Vector2) {
-//     let w = size.x / DIM as f32;
-//     let h = size.y / DIM as f32;
-//
-//     for j in 0..DIM {
-//         for i in 0..DIM {
-//             let index = i + j * DIM;
-//             let cell = &grid[index];
-//             if cell.collapsed {
-//                 let tile_index = cell.sockets[0];
-//                 let tile = &tiles[tile_index];
-//                 // Add code here to draw the tile using tile.create_sprite_component(w, h, i * w, j * h)
-//             }
-//         }
-//     }
-// }
+pub fn draw(canvas: &mut Canvas<Window>, grid: &[Cell], tiles: &[Tile]) {
+    let w = GAME_WIDTH / DIM as u32;
+    let h = GAME_HEIGHT / DIM as u32;
+
+    for j in 0..DIM {
+        for i in 0..DIM {
+            let index = i + j * DIM;
+            let cell = &grid[index];
+            if cell.collapsed {
+                let tile_index = cell.sockets[0];
+                let tile = &tiles[tile_index];
+                tile.render(
+                    canvas,
+                    (i as u32 * w).try_into().unwrap(),
+                    (j as u32 * h).try_into().unwrap(),
+                    w,
+                    h,
+                );
+            }
+        }
+    }
+}
 
 // fn main_loop(grid: &mut Vec<Cell>) {
 //     let low_entropy_grid = pick_cell_with_least_entropy(grid);
@@ -189,7 +201,6 @@ fn random_selection_of_sockets(grid_target: &mut [Cell]) -> bool {
         if cell.sockets.is_empty() {
             return false;
         }
-
         if let Some(&pick) = cell.sockets.choose(&mut rng) {
             cell.sockets = vec![pick];
             true

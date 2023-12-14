@@ -67,18 +67,25 @@ async fn main() -> Result<(), MyError> {
     let texture_creator = canvas.texture_creator();
     let mut tiles = create_tiles_from_json(&texture_creator, JSON_FILE_NAME).await?;
     create_rotate_tiles(&mut tiles);
+    generating_adjacency_rules(&mut tiles);
+
     let mut grid: Vec<Cell> = (0..DIM * DIM)
         .map(|index| Cell::from_value(tiles.len()))
         .collect();
-
-    println!("{:?}", tiles.len());
 
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     canvas.clear();
     canvas.present();
 
+    // main_loop(&mut grid, &tiles);
+
+    // 2回目で、Cell { collapsed: false, sockets: [] } すべて socketsが空に
+    // main_loop(&mut grid, &tiles);
+
     let mut event_pump: EventPump = sdl_context.event_pump()?;
     'running: loop {
+        main_loop(&mut grid, &tiles);
+
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. }
@@ -105,7 +112,6 @@ async fn main() -> Result<(), MyError> {
         // }
 
         draw(&mut canvas, &grid, &tiles);
-
         // tiles[4].render(&mut canvas, 0, 0, 100, 100);
 
         canvas.present();
@@ -137,20 +143,24 @@ pub fn draw(canvas: &mut Canvas<Window>, grid: &[Cell], tiles: &[Tile]) {
     }
 }
 
-// fn main_loop(grid: &mut Vec<Cell>) {
-//     let low_entropy_grid = pick_cell_with_least_entropy(grid);
-//     if low_entropy_grid.is_empty() {
-//         return;
-//     }
-//     if !random_selection_of_sockets(low_entropy_grid) {
-//         start_over(grid);
-//         return;
-//     }
-//     wave_collapse(grid);
-// }
+pub fn main_loop(grid: &mut Vec<Cell>, tiles: &[Tile]) {
+    // println!("{:?}", grid);
+    let mut low_entropy_grid = pick_cell_with_least_entropy(grid);
+    if low_entropy_grid.is_empty() {
+        return;
+    }
+    if !random_selection_of_sockets(&mut low_entropy_grid) {
+        // start_over(grid);
+        println!("start_over");
+        return;
+    }
+    // println!("{:?}", low_entropy_grid);
+    wave_collapse(grid, tiles);
+}
 
 pub fn generating_adjacency_rules(tiles: &mut [Tile]) {
     let tile_edges: Vec<_> = tiles.iter().map(|tile| tile.edges.clone()).collect();
+
     for (index, tile) in tiles.iter_mut().enumerate() {
         tile.analyze(&tile_edges, index);
     }
@@ -169,17 +179,17 @@ pub fn create_rotate_tiles(tiles: &mut Vec<Tile>) {
     tiles.extend(new_tiles);
 }
 
-fn pick_cell_with_least_entropy(grid: &[Cell]) -> Vec<Cell> {
-    let mut grid_copy: Vec<Cell> = grid
-        .iter()
-        .filter(|cell| !cell.collapsed)
-        .cloned()
-        .collect();
+fn pick_cell_with_least_entropy(grid: &mut Vec<Cell>) -> Vec<&mut Cell> {
+    let mut grid_copy: Vec<&mut Cell> = Vec::new();
 
+    for cell in grid.iter_mut() {
+        if !cell.collapsed {
+            grid_copy.push(cell);
+        }
+    }
     if grid_copy.is_empty() {
         return Vec::new();
     }
-
     grid_copy.sort_by_key(|cell| cell.sockets.len());
 
     let len = grid_copy[0].sockets.len();
@@ -192,11 +202,11 @@ fn pick_cell_with_least_entropy(grid: &[Cell]) -> Vec<Cell> {
     grid_copy
 }
 
-fn random_selection_of_sockets(grid_target: &mut [Cell]) -> bool {
+fn random_selection_of_sockets(grid_target: &mut Vec<&mut Cell>) -> bool {
     let mut rng = rand::thread_rng();
 
     if let Some(cell) = grid_target.choose_mut(&mut rng) {
-        cell.collapsed = true;
+        (*cell).collapsed = true;
 
         if cell.sockets.is_empty() {
             return false;
@@ -223,7 +233,6 @@ fn wave_collapse(grid: &mut Vec<Cell>, tiles: &[Tile]) {
                 next_grid[index] = Some(grid[index].clone());
             } else {
                 let mut sockets: Vec<usize> = (0..tiles.len()).collect();
-
                 // Look up
                 if j > 0 {
                     cell_collapse(&mut grid[i + (j - 1) * DIM], "down", &mut sockets, tiles);
@@ -258,7 +267,7 @@ fn get_valid_sockets(cell: &Cell, direction: &str, tiles: &[Tile]) -> Vec<usize>
     let mut valid_sockets = Vec::new();
 
     for &socket in &cell.sockets {
-        let valid = &tiles[socket as usize].valid(direction);
+        let valid = &tiles[socket].valid(direction);
         valid_sockets.extend(valid);
     }
 

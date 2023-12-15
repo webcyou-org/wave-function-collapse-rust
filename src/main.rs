@@ -9,6 +9,7 @@ use crate::core::wfc::{pick_cell_with_least_entropy, random_selection_of_sockets
 use crate::utility::error::*;
 use crate::utility::utility::{create_tiles_from_json, sdl_init};
 use sdl2::event::Event;
+use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
@@ -35,6 +36,12 @@ async fn main() -> Result<(), MyError> {
                     ..
                 } => {
                     break 'running;
+                }
+                Event::MouseButtonDown {
+                    mouse_btn: MouseButton::Left,
+                    ..
+                } => {
+                    grid = init_grid(tiles.len());
                 }
                 _ => {}
             }

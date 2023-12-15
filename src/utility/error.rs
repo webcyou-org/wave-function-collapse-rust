@@ -1,6 +1,6 @@
-use serde_json::{Error as JsonError, Result as JsonResult};
+use serde_json::Error as JsonError;
 use std::fmt;
-use std::io::{self, Error as IoError};
+use std::io::Error as IoError;
 
 #[derive(Debug)]
 pub enum MyError {

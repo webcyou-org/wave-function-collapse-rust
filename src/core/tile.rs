@@ -1,10 +1,9 @@
 use crate::utility::error::*;
 use crate::utility::utility::compare_edge;
-use sdl2::image::{self, LoadTexture};
+use sdl2::image::LoadTexture;
 use sdl2::rect::{Point, Rect};
 use sdl2::render::{Canvas, Texture, TextureCreator};
 use sdl2::video::WindowContext;
-use std::f64::consts::PI;
 use std::rc::Rc;
 
 pub struct Tile<'a> {

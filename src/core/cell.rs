@@ -13,8 +13,6 @@ impl Cell {
     }
 
     pub fn from_list(value: Vec<usize>) -> Cell {
-        // 空
-        // println!("value: {:?}", value);
         Cell {
             collapsed: false,
             sockets: value,

@@ -62,8 +62,6 @@ impl<'a> Tile<'a> {
     // }
 
     pub fn analyze(&mut self, tile_edges: &[Vec<String>], current_index: usize) {
-        println!("analyze");
-
         for (index, edges) in tile_edges.iter().enumerate() {
             if index == current_index {
                 continue;
@@ -85,7 +83,6 @@ impl<'a> Tile<'a> {
                 self.left.push(index);
             }
         }
-        println!("self.left {:?}", self.left);
     }
 
     pub fn valid(&self, direction: &str) -> Vec<usize> {

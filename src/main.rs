@@ -6,59 +6,17 @@ use crate::constants::defines::*;
 use crate::core::cell::Cell;
 use crate::core::tile::Tile;
 use crate::utility::error::*;
+use crate::utility::utility::{create_tiles_from_json, sdl_init};
 use rand::seq::SliceRandom;
 use rand::Rng;
 use sdl2::event::Event;
 use sdl2::pixels::Color;
-use sdl2::rect::Rect;
-use sdl2::render::{Canvas, TextureCreator};
-use sdl2::video::{Window, WindowContext};
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 use sdl2::EventPump;
-use sdl2::Sdl;
 use serde::{Deserialize, Serialize};
-use std::fs::File;
 use std::io::Read;
 use tokio;
-
-async fn load_json_data(file_name: &str) -> Result<TileListData, MyError> {
-    let mut file = File::open(format!("assets/data/{}", file_name))?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-    let data: TileListData = serde_json::from_str(&contents)?;
-    Ok(data)
-}
-
-async fn create_tiles_from_json<'a>(
-    texture_creator: &'a TextureCreator<WindowContext>,
-    file_name: &str,
-) -> Result<Vec<Tile<'a>>, MyError> {
-    let tile_list_data = load_json_data(file_name).await?;
-    let mut tiles = Vec::new();
-
-    for tile_data in tile_list_data.tile_list {
-        tiles.push(Tile::load(
-            texture_creator,
-            tile_data.src,
-            tile_data.edges,
-            tile_data.is_rotate,
-        )?);
-    }
-
-    Ok(tiles)
-}
-
-fn sdl_init(sdl_context: &Sdl) -> Result<Canvas<Window>, MyError> {
-    let video_subsystem = sdl_context.video()?;
-    let window = video_subsystem
-        .window(WINDOW_TITLE, GAME_WIDTH, GAME_HEIGHT)
-        .position_centered()
-        .build()
-        .map_err(|e| e.to_string())?;
-
-    let canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
-
-    Ok(canvas)
-}
 
 #[tokio::main]
 async fn main() -> Result<(), MyError> {
@@ -76,11 +34,6 @@ async fn main() -> Result<(), MyError> {
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     canvas.clear();
     canvas.present();
-
-    // main_loop(&mut grid, &tiles);
-
-    // 2回目で、Cell { collapsed: false, sockets: [] } すべて socketsが空に
-    // main_loop(&mut grid, &tiles);
 
     let mut event_pump: EventPump = sdl_context.event_pump()?;
     'running: loop {
@@ -101,19 +54,7 @@ async fn main() -> Result<(), MyError> {
 
         canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
         canvas.clear();
-
-        // for tile in &tiles {
-        //     // let texture = &tile.texture;
-        //     // let query = texture.query();
-        //     // let texture_rect = Rect::new(0, 0, query.width, query.height);
-        //     //
-        //     // canvas.copy(texture, None, Some(texture_rect))?;
-        //     tile.render(&mut canvas, 0, 0, 100, 100);
-        // }
-
         draw(&mut canvas, &grid, &tiles);
-        // tiles[4].render(&mut canvas, 0, 0, 100, 100);
-
         canvas.present();
     }
 
@@ -144,7 +85,6 @@ pub fn draw(canvas: &mut Canvas<Window>, grid: &[Cell], tiles: &[Tile]) {
 }
 
 pub fn main_loop(grid: &mut Vec<Cell>, tiles: &[Tile]) {
-    // println!("{:?}", grid);
     let mut low_entropy_grid = pick_cell_with_least_entropy(grid);
     if low_entropy_grid.is_empty() {
         return;
@@ -154,7 +94,6 @@ pub fn main_loop(grid: &mut Vec<Cell>, tiles: &[Tile]) {
         println!("start_over");
         return;
     }
-    // println!("{:?}", low_entropy_grid);
     wave_collapse(grid, tiles);
 }
 

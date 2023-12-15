@@ -11,8 +11,8 @@ use rand::seq::SliceRandom;
 use rand::Rng;
 use sdl2::event::Event;
 use sdl2::pixels::Color;
-use sdl2::render::Canvas;
-use sdl2::video::Window;
+use sdl2::render::{Canvas, TextureCreator};
+use sdl2::video::{Window, WindowContext};
 use sdl2::EventPump;
 use serde::{Deserialize, Serialize};
 use std::io::Read;
@@ -23,17 +23,9 @@ async fn main() -> Result<(), MyError> {
     let sdl_context = sdl2::init()?;
     let mut canvas = sdl_init(&sdl_context)?;
     let texture_creator = canvas.texture_creator();
-    let mut tiles = create_tiles_from_json(&texture_creator, JSON_FILE_NAME).await?;
-    create_rotate_tiles(&mut tiles);
-    generating_adjacency_rules(&mut tiles);
 
-    let mut grid: Vec<Cell> = (0..DIM * DIM)
-        .map(|index| Cell::from_value(tiles.len()))
-        .collect();
-
-    canvas.set_draw_color(Color::RGB(255, 255, 255));
-    canvas.clear();
-    canvas.present();
+    let mut tiles = init_tiles(&texture_creator).await?;
+    let mut grid: Vec<Cell> = init_grid(tiles.len());
 
     let mut event_pump: EventPump = sdl_context.event_pump()?;
     'running: loop {
@@ -51,14 +43,25 @@ async fn main() -> Result<(), MyError> {
                 _ => {}
             }
         }
-
-        canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         draw(&mut canvas, &grid, &tiles);
         canvas.present();
     }
-
     Ok(())
+}
+
+async fn init_tiles(texture_creator: &TextureCreator<WindowContext>) -> Result<Vec<Tile>, MyError> {
+    let mut tiles = create_tiles_from_json(&texture_creator, JSON_FILE_NAME).await?;
+    create_rotate_tiles(&mut tiles);
+    generating_adjacency_rules(&mut tiles);
+    Ok(tiles)
+}
+
+fn init_grid(length: usize) -> Vec<Cell> {
+    (0..DIM * DIM)
+        .map(|index| Cell::from_value(length))
+        .collect()
 }
 
 pub fn draw(canvas: &mut Canvas<Window>, grid: &[Cell], tiles: &[Tile]) {
@@ -90,8 +93,7 @@ pub fn main_loop(grid: &mut Vec<Cell>, tiles: &[Tile]) {
         return;
     }
     if !random_selection_of_sockets(&mut low_entropy_grid) {
-        // start_over(grid);
-        println!("start_over");
+        *grid = init_grid(tiles.len());
         return;
     }
     wave_collapse(grid, tiles);
@@ -192,7 +194,6 @@ fn wave_collapse(grid: &mut Vec<Cell>, tiles: &[Tile]) {
             }
         }
     }
-
     grid.clear();
     grid.extend(next_grid.into_iter().filter_map(|cell| cell));
 }

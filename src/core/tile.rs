@@ -40,27 +40,6 @@ impl<'a> Tile<'a> {
         })
     }
 
-    // pub fn analyze(&mut self, tiles: &[Tile]) {
-    //     for (i, tile) in tiles.iter().enumerate() {
-    //         // UP
-    //         if compare_edge(&tile.edges[2], &self.edges[0]) {
-    //             self.up.push(i);
-    //         }
-    //         // RIGHT
-    //         if compare_edge(&tile.edges[3], &self.edges[1]) {
-    //             self.right.push(i);
-    //         }
-    //         // DOWN
-    //         if compare_edge(&tile.edges[0], &self.edges[2]) {
-    //             self.down.push(i);
-    //         }
-    //         // LEFT
-    //         if compare_edge(&tile.edges[1], &self.edges[3]) {
-    //             self.left.push(i);
-    //         }
-    //     }
-    // }
-
     pub fn analyze(&mut self, tile_edges: &[Vec<String>], current_index: usize) {
         for (index, edges) in tile_edges.iter().enumerate() {
             if index == current_index {
